@@ -1,0 +1,56 @@
+<link rel="stylesheet" href="/static/bootstrap.min.css" media = "screen">
+<link rel="stylesheet" href="/static/style.css" media="screen">
+	
+{% block body %}
+<div class="p-3 mb-2 bg-dark text-white">
+	<title> Scan Results </title>
+	<div align="center"  style="width: 100rem; padding-top: 50px;" class="container">
+{% if session['logged_in'] %}
+<h1><u> SCAN RESULTS </u></h1>
+<a href="/"> Go back </a>
+<ul>
+	<!-- <li> Scan result 1... </li> -->
+	<!-- <li> Scan result 2... </li> -->
+	<br>
+	<table style= "width:100%; color:white; font-size: 20px;" border = "2"; bordercolor=black>
+			  <tr>
+			    <th>Vulnerable</th>
+			    <th>Scanned At</th> 
+			    <th>IP Address</th>
+			    <th>Device Name</th>
+			    <th>Port Number</th>
+			    <th>Protocol</th>
+			    <th>Operating System</th>
+			    <th>Architecture</th>
+  			</tr>
+
+			<tbody>
+			  {% for segment in toDisplay %}
+			    <tr>
+				      <td>{{segment.vulnerable}}</td>
+				      <td>{{segment.timestamp}}</td>
+				      <td>{{segment.ip}}</td>
+				      <td>{{segment.device}}</td>
+
+				      <td>{{segment.port}}</td>
+				      <td>{{segment.protocol}}</td>
+				      <td>{{segment.os}}</td>
+				      <td>{{segment.arch}}</td>
+				
+			    </tr>
+			  {% endfor %}
+			  <br><br>
+			</tbody>
+	</table>
+	<!-- {{ toDisplay }} -->
+</ul>
+
+<a href="/"> Go back </a>
+{% endif %}
+
+<!-- will use results from the get scan results method in IoT Scanner -->
+<!-- use a loop for displaying results . -->
+	</div>
+</div>
+</div>
+{% endblock %}

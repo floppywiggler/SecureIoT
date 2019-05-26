@@ -293,7 +293,7 @@ def deleteDevice():
 lock = threading.Lock()
 cond = threading.Condition(threading.Lock())
 
-# Testing commit
+# Testing committ
 
 def waitLock(timeout):
     with cond:

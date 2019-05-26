@@ -18,8 +18,9 @@ class ProtocolScanner(object):
 
     def isPortOpen(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(3)
+        sock.settimeout(8)
         result = sock.connect_ex((str(self.IPAddress), self.portNumber))
+
         try:
             sock.shutdown(2)
         except: # anything really

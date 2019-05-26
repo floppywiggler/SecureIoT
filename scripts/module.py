@@ -95,7 +95,6 @@ class DeviceScanner():
 
         for p in processes:
             p.join()
-            print("Joining process")
 
 
         return self.scanResults
@@ -105,9 +104,9 @@ class DeviceScanner():
         try:
             socket.gethostbyaddr(IPAddress)
         except socket.herror:
-            print("Unknown host {0}".format(IPAddress))
+            print("[-] Unknown host {0}".format(IPAddress))
             return
-        protocols = ["SSH", "FTP", "Telnet"]
+        protocols = ["SSH", "FTP", "Telnet", "SMB", "RDP"]
         for protocol in protocols:
             # print(IPAddress, protocol)
             if ProtocolScanner(protocol, getPort(protocol), IPAddress).isPortOpen() != 0:

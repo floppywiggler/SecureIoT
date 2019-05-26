@@ -235,7 +235,7 @@ class DeviceExploit():
         except socket.herror:
             print("[-] Unknown host {0}".format(IPAddress))
             return
-        protocols = ["SSH", "FTP", "Telnet"]
+        protocols = ["SSH", "FTP"]
         for protocol in protocols:
             # print(IPAddress, protocol)
             if ProtocolExploiter(protocol, getPort(protocol), IPAddress, MAC).isPortOpen() != 0:

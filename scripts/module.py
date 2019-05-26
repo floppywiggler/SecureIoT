@@ -57,7 +57,7 @@ class Credentials():
 
 
 class ScanResults():
-    def __init__(self, timestamp, vulnerable, IPAddress, deviceName, portNumber, protocolName, os, architecture, MAC):
+    def __init__(self, timestamp, vulnerable, IPAddress, deviceName, portNumber, protocolName, os, vendor, MAC):
         self.timestamp = timestamp
         self.vulnerable = vulnerable
         self.IPAddress = IPAddress
@@ -65,7 +65,7 @@ class ScanResults():
         self.portNumber = portNumber
         self.protocolName = protocolName
         self.os = os
-        self.architecture = architecture
+        self.vendor = vendor
         self.MAC = MAC
 
 
@@ -103,7 +103,7 @@ class DeviceScanner():
     def attemptLogin(self, IPAddress):
         IPAddress = str(ipaddress.IPv4Address(IPAddress))
         MAC = get_mac_address(ip="{}".format(IPAddress))
-
+        Vendor = resolveVendor(MAC)
         try:
             socket.gethostbyaddr(IPAddress)
         except socket.herror:
@@ -120,7 +120,7 @@ class DeviceScanner():
                     "port": getPort(protocol),
                     "protocol": protocol,
                     "os": "NA",
-                    "arch": "NA",
+                    "vendor": Vendor,
                     "device": "NA",
                     "mac": MAC
                 }
@@ -145,13 +145,13 @@ class DeviceScanner():
                         "port": getPort(protocol),
                         "protocol": protocol,
                         "os": parsedEvidence["os"],
-                        "arch": parsedEvidence["arch"],
+                        "vendor": Vendor,
                         "device": parsedEvidence["dev"],
                         "mac": MAC
                     }
                     detected = True
                     self.db.insertIntoScanResults(curTime, "Yes", IPAddress, parsedEvidence["dev"], getPort(protocol),
-                                                  protocol, parsedEvidence["os"], parsedEvidence["arch"], MAC)
+                                                  protocol, parsedEvidence["os"], Vendor, MAC)
                     self.scanResults.append(currentResult)
                     print(currentResult)
                 except:
@@ -164,12 +164,12 @@ class DeviceScanner():
                     "port": getPort(protocol),
                     "protocol": protocol,
                     "os": "NA",
-                    "arch": "NA",
+                    "vendor": resolveVendor(MAC),
                     "device": "NA",
-                    "mac": MAC
+                    "mac": getMAC(IPAddress)
 
                 }
-                self.db.insertIntoScanResults(currentTime(), "No", IPAddress, "NA", getPort(protocol), protocol, None, None, MAC)
+                self.db.insertIntoScanResults(currentTime(), "No", IPAddress, "NA", getPort(protocol), protocol, None, resolveVendor(MAC), MAC)
                 print(currentResult)
                 self.scanResults.append(currentResult)
 
@@ -219,7 +219,7 @@ class DatabaseHandler():
         for row in rows:
             if row.Timestamp.count(date) > 0:
                 scanResult = ScanResults(row.Timestamp, row.Vulnerable, row.IPAddress, row.Device, row.portNumber,
-                                         row.protocolName, row.os, row.arch)
+                                         row.protocolName, row.os, row.Vendor)
                 scanResults.append(scanResult)
 
         return scanResults
@@ -245,7 +245,7 @@ class DatabaseHandler():
         scanResults = []
         for row in rows:
             scanResult = ScanResults(row.Timestamp, row.Vulnerable, row.IPAddress, row.Device, row.portNumber,
-                                     row.protocolName, row.os, row.arch, row.mac)
+                                     row.protocolName, row.os, row.Vendor, row.mac)
             scanResults.append(scanResult)
         scanResults.sort(key=lambda x: x.timestamp, reverse=True)
         return scanResults
@@ -265,12 +265,12 @@ class DatabaseHandler():
         delete_cred.execute()
         return None
 
-    def insertIntoScanResults(self, time, vulnerable, IPAddress, device, portNumber, protocolName, os, arch, mac):
+    def insertIntoScanResults(self, time, vulnerable, IPAddress, device, portNumber, protocolName, os, Vendor, mac):
         metadata = MetaData(self.db)
         scan_results = Table('ScanResults', metadata, autoload=True)
         insert_scan_results = scan_results.insert()
         insert_scan_results.execute(Timestamp=time, Vulnerable=vulnerable, IPAddress=IPAddress, Device=device,
-                                    portNumber=portNumber, protocolName=protocolName, os=os, arch=arch, mac=mac)
+                                    portNumber=portNumber, protocolName=protocolName, os=os, Vendor=Vendor, mac=mac)
         return None
 
     def purgeScanResults(self, date):

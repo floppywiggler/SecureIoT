@@ -1,7 +1,8 @@
 from collections import defaultdict
 from datetime import datetime, timedelta
 from getmac import get_mac_address
-
+import ipaddress
+import requests
 
 def parseEvidence(evidence):
     evidenceSplit = evidence.split()
@@ -36,6 +37,13 @@ def getPort(protocol):
 def getMAC(ip):
     ip_mac = get_mac_address(ip="{}".format(ip))
     return ip_mac
+
+def resolveVendor(MAC):
+    MAC_URL = 'http://macvendors.co/api/%s'
+    r = requests.get(MAC_URL % '{}'.format(MAC))
+    obj = r.json()
+    vendor = (obj['result']['company'])
+    return vendor
 
 def getLast15Dates():
     dates = []

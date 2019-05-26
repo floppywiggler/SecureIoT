@@ -20,6 +20,8 @@ class ProtocolScanner(object):
     def getMACaddress(self):
         return self.MACaddress
 
+
+
     def isPortOpen(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(8)

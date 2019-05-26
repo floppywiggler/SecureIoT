@@ -1,0 +1,320 @@
+{% block body %}
+<div class="p-3 mb-2 bg-dark text-white" style="height: 100vh">
+<title> Admin Dashboard </title>
+<!-- Latest compiled and minified CSS -->
+<style type="text/css">
+  .item {
+  height: 60vh;
+  min-height: 300px;
+  width: 100%;
+  background: no-repeat center center scroll;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+img {
+    border-radius: 2px;
+   /* -webkit-filter: grayscale(100%);  Safari 6.0 - 9.0 
+    filter: grayscale(100%);*/
+/*      filter        : blur(2px);
+  -moz-filter   : blur(2px);
+  -webkit-filter: blur(2px);
+  -o-filter     : blur(2px);*/
+}
+.overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  /*height: 30vh;*/
+  width: 100%;
+  opacity: 0;
+  transition: 1s ease;
+  background-color: transparent;
+  filter        : blur(1000px);
+  -moz-filter   : blur(10000px);
+  -webkit-filter: blur(10px);
+  -o-filter     : blur(750px);
+    
+}
+
+.container:hover .overlay {
+  opacity: 0.6;
+}
+
+.text {
+  color: white;
+  font-size: 20px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+}
+</style>
+
+
+<link rel="stylesheet" href="/static/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript">
+  function on() {
+    document.getElementById("overlay").style.display = "block";
+}
+
+function off() {
+    document.getElementById("overlay").style.display = "none";
+}
+</script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<!-- <link rel="stylesheet" type = "text/css" href = "{{ url_for('static', filename = 'style.css' ) }}"> -->
+
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">
+  	 
+  	  <img src="/static/scanner.jpeg" width="30 " height="30" class="d-inline-block align-top" alt="">
+   	  IoT Vulnerability Scanner
+  </a>
+ 
+ <!-- Sidebar -->
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item ">
+        <a class="nav-link" href="/about"><h4>About</h4> <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="/"><h4>Dashboard</h4></a>
+      </li>
+      <li class="nav-item">
+          <a class="nav-link" href="/logout"><h4>Logout</h4></a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<!-- <div id="mask" >
+  <img src="/static/chicago.jpg">
+</div>
+ -->
+<div style="padding-top: 0px;" align="center" class = "container">
+
+
+<h1> Welcome to the admin dashboard  !</h1>
+<br>
+<form style="color: black" method="POST" action ="/scanresults">
+  <input type="Starting IP" name="start_ip" placeholder="Starting IP">
+  <input type="Ending IP" name="end_ip" placeholder="Ending IP">
+  <button type="submit" class="btn btn-dark" style="color: white">Scan Devices</button>
+  
+  <!-- more functions like add new device entry, delete scan results, etc. --> 
+</form>
+
+<!-- Alert to be displayed if the IP range is invalid. -->
+{% if invalidIP %}
+<div class="alert alert-danger">
+  <strong>Please enter valid IP range!</strong>
+</div>
+{% endif %}
+
+
+{% if showAdminRemovedAlert %}
+<div class="alert alert-success">
+  <strong>Admin successfully removed!</strong>
+</div>
+{% endif %}
+
+{% if resultsPurgedAlert %}
+<div class="alert alert-success">
+  <strong>Scan Results Purged!</strong>
+</div>
+{% endif %}
+
+
+
+</div>
+
+
+  <!-- <div class="container" align="center" style="height: 60vh; width: 100vh"> -->
+     
+      <div class="row" >
+        <!-- <div class="col-sm-12"> -->
+        <div id="myCarousel" class="carousel slide" data-ride="carousel">
+        <!-- Indicators -->
+        <ol class="carousel-indicators">
+          <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+          <li data-target="#myCarousel" data-slide-to="1"></li>
+          <li data-target="#myCarousel" data-slide-to="2"></li>
+          <li data-target="#myCarousel" data-slide-to="3"></li>
+          <li data-target="#myCarousel" data-slide-to="4"></li>
+          <li data-target="#myCarousel" data-slide-to="5"></li>
+          <li data-target="#myCarousel" data-slide-to="6"></li>
+          <!-- <li data-target="#myCarousel" data-slide-to="7"></li> -->
+
+
+        </ol>
+
+        <!-- Wrapper for slides -->
+
+        <div class="carousel-inner" role="listbox">
+          
+
+          <div class="item active" >
+            <img src="/static/wideimg.jpg" alt="Info slide" height = "700px">
+          <div class="container">
+            <div class="overlay">
+              <img src="/static/wideimg.jpg" alt="Info slide" height = "700px">
+             </div>
+            <div class="carousel-caption" align="center" style="padding-bottom: 21vh">
+
+            <h3> Keep your devices secure! </h3>
+             Explore the different functionalities.
+             
+          </div>
+          </div>
+        </div>
+
+          <div class="item">
+            <a href="/addDeviceToggle"><img src="/static/addcred.jpg" alt="Add / Delete Default Credentials" height = "700px"></a>
+          <div class="container">
+            <div class="overlay">
+              <a href="/addDeviceToggle"><img src="/static/addcred.jpg" alt="Add / Delete Default Credentials" height = "700px"></a>
+             </div>
+            <div class="carousel-caption" align="center">
+              <h4>Add / Delete Default Credentials</h4>
+              <!-- <div class="overlay"> <a href="/addDeviceToggle"><h2>Add Default Credentials</h2></a> -->
+              <!-- </div> -->
+            </div>
+          </div>
+        </div>
+          
+<!-- 
+          <div class="item">
+           <a href="/deleteDeviceToggle">
+            <img src="/static/delcred.jpg" alt="Delete Default Credentials" height = "700px">
+           </a>
+            <div class="container">
+              <div class="overlay">
+                 <a href="/deleteDeviceToggle">
+                  <img src="/static/delcred.jpg" alt="Delete Default Credentials" height = "700px">
+                 </a>
+               </div>
+            <div class="carousel-caption" align="center">
+              <h4>Delete Default Credentials</h4>
+             </div>
+            </div>
+ -->
+
+          <!-- </div> -->
+
+          <div class="item">
+             <a href="/viewscanhistory">
+             <img src="/static/scanhistory.jpg" alt="View Scan History">
+            </a>
+            <div class="container">
+              <div class="overlay">
+                  <a href="/viewscanhistory">
+             <img src="/static/scanhistory.jpg" alt="View Scan History">
+            </a>
+             </div>
+            <div class="carousel-caption" align="center" >
+               <h4>View Scan History</h4>
+                 
+            </div>
+          </div>
+          </div>
+
+            <div class="item">
+            <a href="/viewcredentials">
+              <img src="/static/hacker.jpg" alt="View Default Credentials">
+            </a>
+            <div class="container">
+               <div class="overlay">        <a href="/viewcredentials">
+              <img src="/static/hacker.jpg" alt="View Default Credentials">
+            </a>
+              </div>
+            <div class="carousel-caption" align="center">
+            <h4>View Default Credentials</h4>
+           
+            </div>
+          </div>
+        </div>
+
+          <div class="item">
+            <a href="/register">
+             <img src="/static/regadmin.jpg" alt="Register New Admin">
+           </a>
+           <div class="container">
+              <div class="overlay">     <a href="/register">
+             <img src="/static/regadmin.jpg" alt="Register New Admin">
+           </a>
+              </div>
+            <div class="carousel-caption" align="center" >
+            <h4>Register/Deregister Admin</h4>
+            
+            </div>
+          </div>
+        </div>
+
+          <div class="item">
+            <a href="/graph"><img src="/static/widegraph.jpg" alt="View Graphical Data"></a>
+              <div class="container">
+                   <div class="overlay">  <a href="/graph"><img src="/static/widegraph.jpg" alt="View Graphical Data"></a>
+                  </div>
+              <div class="carousel-caption" align="center">
+          
+                  <h4>View Graphical Data</h4>
+               
+              </div>
+            </div>
+          </div>
+
+          <div class="item">
+            <a href="/displayAdmins"><img src="/static/scanimage.jpg" alt="Display Admins" height = "700px"></a>
+          <div class="container">
+            <div class="overlay">
+              <a href="/displayAdmins"><img src="/static/scanimage.jpg" alt="Display Admins" height = "700px"></a>
+             </div>
+            <div class="carousel-caption" align="center">
+              <h4>View Admins</h4>
+              <!-- <div class="overlay"> <a href="/addDeviceToggle"><h2>Add Default Credentials</h2></a> -->
+              <!-- </div> -->
+            </div>
+          </div>
+        </div>
+
+        </div>
+
+            <!-- Left and right controls -->
+      <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+    </div>
+      </div>
+    <!-- </div> -->
+  </div>
+
+
+
+<!-- </div> -->
+
+
+
+{% endblock %}

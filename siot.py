@@ -1,5 +1,5 @@
 from flask import Flask, flash, redirect, render_template, request, session, abort
-from scripts.module import Admin, Credentials, DeviceScanner, DatabaseHandler
+from scripts.module import Admin, Credentials, DeviceScanner, DatabaseHandler, DeviceExploit
 from scripts import mail
 from scripts.utils import getLast15Dates
 import threading
@@ -26,15 +26,15 @@ def showGraph():
             values.append(db.getScanResultsVulnerableCountForDate(date))
             date_labels.append(datetime.strptime(date, '%Y-%m-%d').strftime('%b %d %Y'))
 
-        db = DatabaseHandler()
-        values = db.scanVulFromDB()
-        print(values[0]) # if the oldest scan's first item - vulnerable or not.
+        #db = DatabaseHandler()
+        #values = db.scanVulFromDB()
+        #print(values[0]) # if the oldest scan's first item - vulnerable or not.
 
-        print(values)
+        #print(values)
         scanlist = []
-        for value in values:
-            scanlist.append(value.Vulnerable)
-            print(scanlist[0])
+        #for value in values:
+        #    scanlist.append(value.Vulnerable)
+        #    print(scanlist[0])
 
         return render_template('graph.html', values=values, labels=date_labels)
     else:
@@ -156,6 +156,40 @@ def display_scan_results():
                     mail.sendMessage([email], msg, messageFor="owner")
 
             return render_template('scanresults.html', toDisplay=toDisplay)
+            # will also pass the scan results object into this template.
+    else:
+        return redirect("/")
+
+
+@siot.route("/exploitresults", methods=['POST'])
+def display_exploit_scan_results():
+    if session.get('logged_in'):
+        ds = DeviceExploit()
+        db = DatabaseHandler()
+
+        toDisplay = ds.scanRange(request.form['start_ip'], request.form['end_ip'])
+        # print(toDisplay)
+        if toDisplay == "invalidIP":
+            return render_template('dashboard.html', invalidIP=True)
+
+        else:
+            mail_page = render_template('mailer.html', toDisplay=toDisplay)
+            # need a list of admins later, to be loaded from the admin db
+            # device owners to be handled
+            mail.sendMessage([config.get('initialization-parameters', 'adminemail')], mail_page)
+            for row in toDisplay:
+                if row['vulnerable'] == "Yes":
+                    email = db.getEmailIdFromIp(row['ip'])
+                    msg = "Your device uses a common/default username & password. Kindly" + \
+                          " change it at the earliest. The scan result for your device:<br>" + \
+                          "Device: " + row['device'] + \
+                          "<br>Protocol: " + row['protocol'] + \
+                          "<br>Port: " + str(row['port']) + \
+                          "<br>Time when scanned: " + str(row['timestamp'])
+                    print(email, msg)
+                    mail.sendMessage([email], msg, messageFor="owner")
+
+            return render_template('exploitresults.html', toDisplay=toDisplay)
             # will also pass the scan results object into this template.
     else:
         return redirect("/")

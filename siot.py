@@ -9,7 +9,6 @@ import threading
 import time
 import configparser
 from datetime import datetime
-from multiprocessing import Queue
 
 siot = Flask(__name__)
 # host='0.0.0.0'

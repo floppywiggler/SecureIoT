@@ -108,7 +108,7 @@ class DeviceScanner():
         except socket.herror:
             print("[-] Unknown host {0}".format(IPAddress))
             return
-        protocols = ["SSH", "FTP", "Telnet", "SMB", "RDP"]
+        protocols = ["SSH", "FTP", "Telnet", "RDP"]
         for protocol in protocols:
             # print(IPAddress, protocol)
             if ProtocolScanner(protocol, getPort(protocol), IPAddress).isPortOpen() != 0:

@@ -2,13 +2,6 @@ import sys
 import pycurl
 from .scanner import ProtocolScanner
 
-if len(sys.argv) != 5:
-        print("[*] NTLM Brute Force Tool For RDP Gateways")
-        print("[*] Usage: %s <RDP Gateway IP> <users file> <passwords file> <domain> [debug]" % sys.argv[0])
-        print("[*] Example: %s localhost users.txt passwords.txt WORK\n" % sys.argv[0])
-        sys.exit(0)
-
-domain = 'HOMEGROUP'
 
 class RDPscanner(ProtocolScanner):
 
@@ -18,6 +11,7 @@ class RDPscanner(ProtocolScanner):
 
 
     def verifyCredentials(self, credentials):
+        domain = 'HOMEGROUP'
         rdp_gateway = "https://" + self.IPAddress + "/rpc/rpcproxy.dll?localhost:3388"
         updata = domain + "\\" + credentials
         packet = pycurl.Curl()

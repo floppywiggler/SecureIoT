@@ -1,10 +1,7 @@
-from flask import Flask
 from flask import Flask, flash, redirect, render_template, request, session, abort
-
 from scripts.module import Admin, Credentials, DeviceScanner, DatabaseHandler
 from scripts import mail
 from scripts.utils import getLast15Dates
-import os
 import threading
 import time
 import configparser
@@ -29,15 +26,16 @@ def showGraph():
             values.append(db.getScanResultsVulnerableCountForDate(date))
             date_labels.append(datetime.strptime(date, '%Y-%m-%d').strftime('%b %d %Y'))
 
-        # db = DatabaseHandler()
-        # values = db.scanVulFromDB()
-        # print(values[0]) # if the oldest scan's first item - vulnerable or not.
+        db = DatabaseHandler()
+        values = db.scanVulFromDB()
+        print(values[0]) # if the oldest scan's first item - vulnerable or not.
 
-        # print(values)
-        # scanlist = []
-        # for value in values:
-        # scanlist.siotend(value.Vulnerable)
-        # print(scanlist[0])
+        print(values)
+        scanlist = []
+        for value in values:
+            scanlist.append(value.Vulnerable)
+            print(scanlist[0])
+
         return render_template('graph.html', values=values, labels=date_labels)
     else:
         return redirect("/")
@@ -142,7 +140,6 @@ def display_scan_results():
 
         else:
             mail_page = render_template('mailer.html', toDisplay=toDisplay)
-            # inserted yash's email ID as admin
             # need a list of admins later, to be loaded from the admin db
             # device owners to be handled
             mail.sendMessage([config.get('initialization-parameters', 'adminemail')], mail_page)
@@ -278,7 +275,7 @@ def addNewDevice():
 
 @siot.route("/deleteDevice", methods=['POST'])
 def deleteDevice():
-    # handle exceptions and return siotropriate message
+    # handle exceptions and return appropriate message
     # call add new device method of service layer.
     #
     if session.get('logged_in'):
@@ -292,7 +289,6 @@ def deleteDevice():
 lock = threading.Lock()
 cond = threading.Condition(threading.Lock())
 
-# Testing committ
 
 def waitLock(timeout):
     with cond:
@@ -310,10 +306,10 @@ if __name__ == "__main__":
     loginFailed = False
     loginCount = 0
     retryOverflow = False
-    admin = Admin("admin name", "admin email", Credentials("admin", "password"))
+    admin = Admin("Emil Sørbrøden", "siotdaemon@gmail.com", Credentials("admin", "password"))
     # protocolScanner = ProtocolScanner("Kunal Protocol" , "9997", "Kunal Host" )
     # myPort = protocolScanner.getPortNumber()
-    siot.secret_key = "secretkey"  # os.urandom(12)
+    siot.secret_key = "itavisen"  # os.urandom(12)
 
     config.read_file(open(r'SIOT.config'))
     host = config.get('initialization-parameters', 'host')

@@ -95,7 +95,8 @@ class DeviceScanner():
 
         for p in processes:
             p.join()
-            # print("Joining process")
+            print("Joining process")
+
 
         return self.scanResults
 

@@ -83,7 +83,7 @@ def lock_ten_sec():
     # waitLock(10)
     if (waitLock(10)):
         waitLock(10)
-    loginCount = 0;
+    loginCount = 0
     return render_template('login.html', loginFailed=False, retryOverflow=False)
 
 

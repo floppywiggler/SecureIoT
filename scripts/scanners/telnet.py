@@ -5,8 +5,8 @@ import socket
 
 class TelnetScanner(ProtocolScanner):
 
-    def __init__(self, protocolName, portNumber, IPAddress):
-        super(TelnetScanner, self).__init__(protocolName, portNumber, IPAddress)
+    def __init__(self, protocolName, portNumber, IPAddress, macaddress):
+        super(TelnetScanner, self).__init__(protocolName, portNumber, IPAddress, macaddress)
 
     def verifyCredentials(self, credentials):
         pswd = credentials.getPassword()

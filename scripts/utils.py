@@ -1,5 +1,6 @@
 from collections import defaultdict
 from datetime import datetime, timedelta
+from getmac import get_mac_address
 
 
 def parseEvidence(evidence):
@@ -32,6 +33,9 @@ def getPort(protocol):
 
     return p[protocol]
 
+def getMAC(ip):
+    ip_mac = get_mac_address(ip="{}".format(ip))
+    return ip_mac
 
 def getLast15Dates():
     dates = []

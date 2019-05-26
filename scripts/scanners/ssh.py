@@ -5,8 +5,8 @@ import socket
 
 class SSHScanner(ProtocolScanner):
 
-	def __init__(self, protocolname, portnumber, ipaddress):
-		super(SSHScanner, self).__init__(protocolname, portnumber, ipaddress)
+	def __init__(self, protocolname, portnumber, ipaddress, macaddress):
+		super(SSHScanner, self).__init__(protocolname, portnumber, ipaddress, macaddress)
 
 	def verifyCredentials(self, credentials):
 		cur = paramiko.SSHClient()

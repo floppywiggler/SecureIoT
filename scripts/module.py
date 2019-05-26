@@ -4,7 +4,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import ipaddress
 import multiprocessing as mp
 
-
 from sqlalchemy import *
 from .scanners.scanner import ProtocolScanner
 from .scanners.ssh import SSHScanner
@@ -14,7 +13,7 @@ from .scanners.rdp import RDPscanner
 
 import socket
 from datetime import datetime
-
+from getmac import get_mac_address
 DEBUG = False
 
 
@@ -58,7 +57,7 @@ class Credentials():
 
 
 class ScanResults():
-    def __init__(self, timestamp, vulnerable, IPAddress, deviceName, portNumber, protocolName, os, architecture):
+    def __init__(self, timestamp, vulnerable, IPAddress, deviceName, portNumber, protocolName, os, architecture, MAC):
         self.timestamp = timestamp
         self.vulnerable = vulnerable
         self.IPAddress = IPAddress
@@ -67,6 +66,7 @@ class ScanResults():
         self.protocolName = protocolName
         self.os = os
         self.architecture = architecture
+        self.MAC = MAC
 
 
 class DeviceScanner():
@@ -98,11 +98,12 @@ class DeviceScanner():
         for p in processes:
             p.join()
 
-
         return self.scanResults
 
     def attemptLogin(self, IPAddress):
         IPAddress = str(ipaddress.IPv4Address(IPAddress))
+        MAC = get_mac_address(ip="{}".format(IPAddress))
+
         try:
             socket.gethostbyaddr(IPAddress)
         except socket.herror:
@@ -111,7 +112,7 @@ class DeviceScanner():
         protocols = ["SSH", "FTP", "Telnet", "RDP"]
         for protocol in protocols:
             # print(IPAddress, protocol)
-            if ProtocolScanner(protocol, getPort(protocol), IPAddress).isPortOpen() != 0:
+            if ProtocolScanner(protocol, getPort(protocol), IPAddress, MAC).isPortOpen() != 0:
                 currentResult = {
                     "vulnerable": "Port Closed",
                     "timestamp": str(currentTime()),
@@ -121,11 +122,12 @@ class DeviceScanner():
                     "os": "NA",
                     "arch": "NA",
                     "device": "NA",
+                    "mac": MAC
                 }
                 self.scanResults.append(currentResult)
                 print(currentResult)
                 continue
-            protocolScanner = globals()[protocol + "Scanner"](protocol, getPort(protocol), IPAddress)
+            protocolScanner = globals()[protocol + "Scanner"](protocol, getPort(protocol), IPAddress, MAC)
             credentials = self.db.getCredentialsFromDB()
             # checking all username and passwords in DB
             detected = False
@@ -144,11 +146,12 @@ class DeviceScanner():
                         "protocol": protocol,
                         "os": parsedEvidence["os"],
                         "arch": parsedEvidence["arch"],
-                        "device": parsedEvidence["dev"]
+                        "device": parsedEvidence["dev"],
+                        "mac": MAC
                     }
                     detected = True
                     self.db.insertIntoScanResults(curTime, "Yes", IPAddress, parsedEvidence["dev"], getPort(protocol),
-                                                  protocol, parsedEvidence["os"], parsedEvidence["arch"])
+                                                  protocol, parsedEvidence["os"], parsedEvidence["arch"], MAC)
                     self.scanResults.append(currentResult)
                     print(currentResult)
                 except:
@@ -162,9 +165,11 @@ class DeviceScanner():
                     "protocol": protocol,
                     "os": "NA",
                     "arch": "NA",
-                    "device": "NA"
+                    "device": "NA",
+                    "mac": MAC
+
                 }
-                self.db.insertIntoScanResults(currentTime(), "No", IPAddress, "NA", getPort(protocol), protocol, None, None)
+                self.db.insertIntoScanResults(currentTime(), "No", IPAddress, "NA", getPort(protocol), protocol, None, None, MAC)
                 print(currentResult)
                 self.scanResults.append(currentResult)
 
@@ -240,7 +245,7 @@ class DatabaseHandler():
         scanResults = []
         for row in rows:
             scanResult = ScanResults(row.Timestamp, row.Vulnerable, row.IPAddress, row.Device, row.portNumber,
-                                     row.protocolName, row.os, row.arch)
+                                     row.protocolName, row.os, row.arch, row.mac)
             scanResults.append(scanResult)
         scanResults.sort(key=lambda x: x.timestamp, reverse=True)
         return scanResults
@@ -260,12 +265,12 @@ class DatabaseHandler():
         delete_cred.execute()
         return None
 
-    def insertIntoScanResults(self, time, vulnerable, IPAddress, device, portNumber, protocolName, os, arch):
+    def insertIntoScanResults(self, time, vulnerable, IPAddress, device, portNumber, protocolName, os, arch, mac):
         metadata = MetaData(self.db)
         scan_results = Table('ScanResults', metadata, autoload=True)
         insert_scan_results = scan_results.insert()
         insert_scan_results.execute(Timestamp=time, Vulnerable=vulnerable, IPAddress=IPAddress, Device=device,
-                                    portNumber=portNumber, protocolName=protocolName, os=os, arch=arch)
+                                    portNumber=portNumber, protocolName=protocolName, os=os, arch=arch, mac=mac)
         return None
 
     def purgeScanResults(self, date):

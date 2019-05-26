@@ -2,10 +2,11 @@ import socket
 
 
 class ProtocolScanner(object):
-    def __init__ (self, protocolName, portNumber, IPAddress):
+    def __init__ (self, protocolName, portNumber, IPAddress, MACaddress):
         self.protocolName = protocolName
         self.portNumber = portNumber
         self.IPAddress = IPAddress
+        self.MACaddress = MACaddress
 
     def getProtocolName(self):
         return self.protocolName
@@ -15,6 +16,9 @@ class ProtocolScanner(object):
 
     def getIPAddress(self):
         return self.IPAddress
+
+    def getMACaddress(self):
+        return self.MACaddress
 
     def isPortOpen(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

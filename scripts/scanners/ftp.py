@@ -2,8 +2,8 @@ from .scanner import ProtocolScanner
 import ftplib
 
 class FTPScanner(ProtocolScanner):
-	def __init__(self, protocolName, portNumber, IPAddress):
-		super(FTPScanner, self).__init__(protocolName, portNumber, IPAddress)
+	def __init__(self, protocolName, portNumber, IPAddress, macaddress):
+		super(FTPScanner, self).__init__(protocolName, portNumber, IPAddress, macaddress)
 	#have to finish the function signature. And find out what's host and port
 	def verifyCredentials(self, credentials):
 		try:

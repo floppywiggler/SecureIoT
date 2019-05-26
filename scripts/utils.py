@@ -28,8 +28,8 @@ def getPort(protocol):
     p["FTP"] = 21
     p["HTTP"] = 80
     p["Telnet"] = 23
-    p["POP3"] = 110
-    p["SMB"] = 445
+    p["RDP"] = 3389
+
     return p[protocol]
 
 

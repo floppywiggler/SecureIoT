@@ -10,6 +10,8 @@ from .scanners.scanner import ProtocolScanner
 from .scanners.ssh import SSHScanner
 from .scanners.ftp import FTPScanner
 from .scanners.telnet import TelnetScanner
+from .scanners.rdp import RDPscanner
+
 import socket
 from datetime import datetime
 
@@ -162,7 +164,7 @@ class DeviceScanner():
                     "arch": "NA",
                     "device": "NA"
                 }
-                self.db.insertIntoScanResults(curTime, "No", IPAddress, "NA", getPort(protocol), protocol, None, None)
+                self.db.insertIntoScanResults(currentTime(), "No", IPAddress, "NA", getPort(protocol), protocol, None, None)
                 print(currentResult)
                 self.scanResults.append(currentResult)
 

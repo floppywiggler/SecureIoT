@@ -1,0 +1,11 @@
+nmap
+scapy
+texttable
+re
+netaddr
+errno
+netifaces
+requests
+yaml
+appdirs
+json

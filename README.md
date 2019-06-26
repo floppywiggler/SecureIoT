@@ -31,12 +31,17 @@ This should solve it:
 On Windows:
 
 If error
----     ERROR: Complete output from command python setup.py egg_info:
+--
+ERROR: Complete output from command python setup.py egg_info:
     ERROR: Please specify --curl-dir=/path/to/built/libcurl
-    ----------------------------------------
+ --
 ERROR: Command "python setup.py egg_info" failed with error code 10 in c:\users\emisor\appdata\local\temp\pip-install-eadztx\pycurl\
- ---
- 
+--
+
  Download pycUr from here: https://www.lfd.uci.edu/~gohlke/pythonlibs/#pycurl
  Install your version with 
  **pip3 install pycurl-7.43.0.3-cp36-cp36m-win32.whl**
+ 
+ Depending on the OS you want to run this on (**Linux should be your choice**), you might have to edit some imports. Notably:
+ $$ from multiprocessing import Queue
+ 

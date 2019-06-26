@@ -3,10 +3,11 @@ SIOT - A framework aimed at securing IoT devices using weak or default credentia
 
 **requirements**
 
-pip3 install flask
-pip3 install getmac
-pip3 install sqlalchemy
-pip3 install pycurl
+**pip3 install flask**
+
+**pip3 install getmac**
+**pip3 install sqlalchemy**
+**pip3 install pycurl**
 
 
 **troubleshoot**
@@ -21,3 +22,17 @@ Command "python setup.py egg_info" failed with error code 1 in /tmp/pip-build-mz
 
 This should solve it:
 **sudo apt install libcurl4-openssl-dev libssl-dev**
+
+
+On Windows:
+
+If error
+---     ERROR: Complete output from command python setup.py egg_info:
+    ERROR: Please specify --curl-dir=/path/to/built/libcurl
+    ----------------------------------------
+ERROR: Command "python setup.py egg_info" failed with error code 10 in c:\users\emisor\appdata\local\temp\pip-install-eadztx\pycurl\
+ ---
+ 
+ Download pycUr from here: https://www.lfd.uci.edu/~gohlke/pythonlibs/#pycurl
+ Install your version with 
+ **pip3 install pycurl-7.43.0.3-cp36-cp36m-win32.whl**

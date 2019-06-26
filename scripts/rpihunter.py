@@ -5,7 +5,7 @@
 #   NOT FINISHED
 # Will be a module to
 # the rest of the app
-#
+# Need to port this to python3 before integration with SIOT
 #
 #
 ###########################

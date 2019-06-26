@@ -6,8 +6,12 @@ SIOT - A framework aimed at securing IoT devices using weak or default credentia
 **pip3 install flask**
 
 **pip3 install getmac**
+
 **pip3 install sqlalchemy**
+
 **pip3 install pycurl**
+
+**pip3 install netifaces**
 
 
 **troubleshoot**

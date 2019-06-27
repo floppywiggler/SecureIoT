@@ -15,7 +15,7 @@
 # check if any online configuration panels can be accessed.
 # Banners are sent off to Shodan to discover the total count of other
 # devices that are running the same piece of software.
-
+#from .scanners import ssh
 
 # Check to see if all modules are installed on system.
 try:
@@ -28,6 +28,8 @@ try:
     import platform
     import re
     import time
+    #from pexpect import pxssh # Not supported on windows
+    import termcolor
 except ModuleNotFoundError:
     exit("Please install requirements.txt (pip install -r requirements.txt")
 
@@ -57,8 +59,8 @@ discoveredPorts = []
 # [Usernames & Passwords]
 # Login combinations that will be used for the basic
 # 'brute-force' against login form or HTTP Auth.
-unames = ['admin', 'administrator', 'user', 'guest']
-passwords = ['admin', 'password', '12345', 'guest']
+unames = ['admin', 'administrator', 'user', 'guest', 'support']
+passwords = ['admin', 'password', 'user', 'guest', 'support']
 
 # Set to 'True' if you would like to see output of what is
 # being discovered and processed
@@ -200,6 +202,44 @@ def robotsCheck(url):
         pass
 
 
+
+# SSH Default credentials check
+# Will try a list of known
+# and weak logins that often
+# get distributed hardcoded into the devices
+# Should have functionality to prioritize
+# certain combinations over other
+# based on mac address of device.
+
+def sshConnect(host, user, password):
+    try:
+        ssh = pxssh.pxssh()
+        ssh.force_password=True
+        ssh.login(host, user, password)
+        print("Password found! "+ termcolor.colored(user+":" + password, 'green'))
+    except pxssh.ExceptionPxssh as error:
+        print(error)
+    except KeyboardInterrupt as k:
+        print("\n")
+        print("Terminating")
+        print("Reason: Program stopped by user")
+        sys.exit(0)
+
+def sshBrute(host):
+    """ The actual iteration over credentials happens here"""
+    userfile = open('userfile.txt')
+    passfile = open('passfile.txt')
+
+    for u in userfile.readlines():
+        for p in passfile.readlines():
+            user = u.strip("\n")
+            password = p.strip("\n")
+            print(str(user) + ":" + str(password))
+            sshConnect(host, str(user), str(password))
+        userfile.close()
+        passfile.close()
+
+
 # [Command Injection Test]
 # If we get a sucessful brute-force on the HTTP Auth.
 # We can test for RCE via two paths:
@@ -325,14 +365,19 @@ else:
 # on your local network. Check the length of the
 # address and determine how much of the string to
 # strip based on the subnet.
+
+
 localAddress = [l for l in (
 [ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [
     [(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in
      [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0]
+print("Length of current local address:")
+print(len(localAddress))
 if len(localAddress) == 13:
     localSubnet = localAddress[:-2] + "0/24"
 else:
-    localSubnet = localAddress[:-1] + "0/24"
+    localSubnet = localAddress[:-3] + "0/24" # Stripping of the host bits
+
 
 # [Debug Information]
 if DEBUG_MODE:
@@ -357,7 +402,7 @@ if PING_SWEEP:
             output = req.communicate()[0]
             isAlive = req.returncode
         else:
-            req = Popen(['ping.exe', '-n', '1', '-w', '1', str(x)], stdout=PIPE)
+            req = Popen(['ping', '-n', '1', '-w', '1', str(x)], stdout=PIPE)
             output = req.communicate()[0]
             isAlive = req.returncode
         sys.stdout.flush()
@@ -423,6 +468,13 @@ if AUTO_SCAN:
         else:
             print("[*] {} Port(s)) Listening: {}".format(str(len(discoveredPorts)), portsOutput))
             print("")
+
+        # Call the SSH bruteforcer
+        if "22" in discoveredPorts: # If 22 is open, launch sshBrute
+            #sshBrute(host)
+            pass
+
+
 
         # [Enumerating Banners]
         # Using the list of ports that are listening for connections

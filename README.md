@@ -1,3 +1,5 @@
+# Do not use this code. Discontinued at the moment
+
 # SecureIoT
 SIOT - A framework aimed at securing IoT devices using weak or default credentials in a network
 
